@@ -1,4 +1,5 @@
 +++
+draft=true
 title="Using a specific package version in Nix"
 date=2022-12-12
 
