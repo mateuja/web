@@ -10,6 +10,8 @@ taxonomies = [
     {name = "tags"}
 ]
 
+generate_feed = true
+
 # Code highlighting
 [markdown]
 highlight_code = true 
