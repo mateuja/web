@@ -66,6 +66,7 @@
                 <div class="post on-list">
                     {{ post_macros::header(page=page) }}
                     {{ post_macros::content(page=page, summary=true) }}
+                    {{ post_macros::footnotes(page=page) }}
                 </div>
             {% endfor -%}
             <div class="pagination">

@@ -101,3 +101,18 @@
         </span>
     {% endif -%}
 {% endmacro tags %}
+
+{% macro footnotes(page) %}
+    {% if page.extra.footnotes %}
+        <details class="footnotes">
+            <summary class="footnotes-title">Footnotes</summary>
+            <div class="footnotes-content">
+                <ol class="footnotes-list">
+                    {%- for fn,fntxt in page.extra.footnotes -%}
+                        <li id="{{loop.index}}">{{ fntxt|safe }} <a href="#note{{loop.index}}">↩</a></li>
+                    {%- endfor -%}
+                </ol>
+            </div>
+        </details>
+    {% endif %}
+{% endmacro footnotes %}
