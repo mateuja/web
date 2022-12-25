@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Jaume Mateu</title>
+    
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="robots" content="noodp"/>
+
+    <link rel="stylesheet" href="https://jaumemateu.xyz/style.css">
+    <link rel="stylesheet" href="https://jaumemateu.xyz/color/pink.css">
+
+        <link rel="stylesheet" href="https://jaumemateu.xyz/color/background_dark.css">
+    
+    <link rel="stylesheet" href="https://jaumemateu.xyz/font-hack-subset.css">
+
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="https://jaumemateu.xyz/rss.xml">
+    
+    </head>
+
+<body class="">
+<div class="container">
+    
+    <header class="header">
+        <div class="header__inner">
+            <div class="header__logo">
+                    
+                <a href="https://jaumemateu.xyz" style="text-decoration: none;">
+                    <div class="logo">
+                      
+                            Jaume Mateu
+                        
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        
+        <nav class="menu">
+            <ul class="menu__inner">
+                <li><a href="https://jaumemateu.xyz/archive">archive</a></li>
+            
+                <li><a href="https://jaumemateu.xyz/tags">tags</a></li>
+            
+                <li><a href="https://jaumemateu.xyz/whoami">whoami</a></li>
+            
+                <li><a href="https://github.com/mateuja" target="_blank" rel="noopener noreferrer">github</a></li>
+            </ul>
+        </nav>
+    
+    
+        
+    </header>
+    
+
+    <div class="content">
+        
+        <div class="posts">
+                <div class="post on-list">
+                    
+    <h1 class="post-title"><a href="https://jaumemateu.xyz/nix-versions/">Using a specific package version in Nix</a></h1>
+    <div class="post-meta-inline">
+        
+    <span class="post-date">
+            2022-12-12
+        </span>
+
+    </div>
+
+    
+        <span class="post-tags-inline">
+                :: tags:&nbsp;
+                <a class="post-tag" href="https://jaumemateu.xyz/tags/nix/">#nix</a></span>
+    
+
+                    
+        <div class="post-content">
+            <p>As part of my journey to learn Haskell, I recently started reading <a href="https://www.manning.com/books/haskell-in-depth">Haskell in
+Depth</a> by Vitaly Bragilevsky.
+The book has an associated repository with code examples that is supposed to be
+compiled with GHC 8.6 and newer. My idea was to build a simple nix expression
+that installed the required dependencies. Although the project is prepared to be
+compiled with both cabal and stack, all the development environments for Haskell
+that I had created until then used stack, so I wanted to give cabal a try.
+Besides, I had recently skimmed through Gabriela Gonzalez's
+<a href="https://github.com/Gabriella439/haskell-nix">haskell-nix</a> repository, in which
+she comments that while Nix is more of a stack substitute, it complements quite
+well with cabal.</p>
+<p>Since the beginning, I started facing problems with dependencies. Neither
+installing cabal and then running <code>cabal build</code> nor using cabal2nix worked. I
+suspect that the problems with the latter were related to the fact that there
+are multiple executables in the project and cabal2nix did not include all of
+them in the generated nix expression. I even ended up trying to use stack, but
+it failed too.</p>
+<p>At some point, I decided that maybe it would be good to reproduce as much as
+possible the development environment of the author, even if the book claimed
+that the project worked with newer versions of GHC. The 8.8.3 version was no
+longer available in the unstable nix-channel, so I had to do some research to
+find a way to retrieve it. I came across this
+<a href="https://lazamar.co.uk/nix-versions/">website</a> which makes it possible to find
+all the versions that were available in a nixpkgs channel for the required
+package and automatically creates a Nix expression to retrieve it. I do not know
+if there are other ways to do the same, but for a Nix newbie like me, this was
+extremely helpful. With some minor additions, I was able to create the following
+<code>shell.nix</code><sup class="footnote-reference"><a href="#1">1</a></sup>:</p>
+<pre data-lang="nix" style="background-color:#191919;color:#f8f8f2;" class="language-nix "><code class="language-nix" data-lang="nix"><span style="color:#ff5e5e;">let
+</span><span>  </span><span style="color:#6d6d6d;"># This nixpkgs version corresponds to the ghc-8.8.3
+</span><span>  </span><span style="color:#97d8ea;">pkgs </span><span style="color:#ff5e5e;">= </span><span style="color:#6699cc;">import
+</span><span>    (</span><span style="color:#ff8942;">builtins</span><span style="color:#ff5e5e;">.</span><span style="font-style:italic;color:#fc9354;">fetchTarball </span><span>{
+</span><span>      </span><span style="color:#97d8ea;">url </span><span style="color:#ff5e5e;">= </span><span style="color:#ffffff;">&quot;</span><span style="color:#fbe3bf;">https://github.com/NixOS/nixpkgs/archive/2d9888f61c80f28b09d64f5e39d0ba02e3923057.tar.gz</span><span style="color:#ffffff;">&quot;</span><span>;
+</span><span>    })
+</span><span>    { };
+</span><span style="color:#ff5e5e;">in
+</span><span style="font-style:italic;color:#fc9354;">pkgs</span><span style="color:#ff5e5e;">.</span><span style="font-style:italic;color:#fc9354;">mkShell </span><span>{
+</span><span>  </span><span style="color:#97d8ea;">name </span><span style="color:#ff5e5e;">= </span><span style="color:#ffffff;">&quot;</span><span style="color:#fbe3bf;">dev-environment</span><span style="color:#ffffff;">&quot;</span><span>;
+</span><span>  </span><span style="color:#97d8ea;">buildInputs </span><span style="color:#ff5e5e;">= </span><span>[
+</span><span>    </span><span style="font-style:italic;color:#fc9354;">pkgs</span><span style="color:#ff5e5e;">.</span><span style="font-style:italic;color:#fc9354;">ghc
+</span><span>    </span><span style="font-style:italic;color:#fc9354;">pkgs</span><span style="color:#ff5e5e;">.</span><span style="font-style:italic;color:#fc9354;">cabal-install
+</span><span>    </span><span style="font-style:italic;color:#fc9354;">pkgs</span><span style="color:#ff5e5e;">.</span><span style="font-style:italic;color:#fc9354;">ghcid
+</span><span>    </span><span style="font-style:italic;color:#fc9354;">pkgs</span><span style="color:#ff5e5e;">.</span><span style="font-style:italic;color:#fc9354;">zlib
+</span><span>    </span><span style="font-style:italic;color:#fc9354;">pkgs</span><span style="color:#ff5e5e;">.</span><span style="font-style:italic;color:#fc9354;">pkg-config
+</span><span>  ];
+</span><span>  </span><span style="color:#97d8ea;">shellHook </span><span style="color:#ff5e5e;">= </span><span style="color:#ffffff;">&#39;&#39;
+</span><span style="color:#fbe3bf;">    echo &quot;Running cabal build...&quot;
+</span><span style="color:#fbe3bf;">    cabal build
+</span><span style="color:#fbe3bf;">
+</span><span style="color:#fbe3bf;">    echo &quot;Start developing&quot;
+</span><span style="color:#fbe3bf;">  </span><span style="color:#ffffff;">&#39;&#39;</span><span>;
+</span><span>}
+</span></code></pre>
+<p>Now I can keep learning Haskell!</p>
+
+        </div>
+
+                    
+    
+        <details class="footnotes">
+            <summary class="footnotes-title">Footnotes</summary>
+            <div class="footnotes-content">
+                <ol class="footnotes-list"><li id="1">I checked that it works using <code>nix-shell--pure</code>, so it should be possible to use it in any environment. <a href="#note1">↩</a></li></ol>
+            </div>
+        </details>
+    
+
+                </div>
+            <div class="pagination">
+                <div class="pagination__buttons"></div>
+            </div>
+        </div>
+        
+    </div>
+
+    
+    <footer class="footer">
+        <div class="footer__inner">
+                <div class="copyright">
+                        <span>λ 
+    2022
+ Jaume Mateu</span>
+                    </div>
+            </div>
+    </footer>
+    
+
+</div>
+</body>
+
+</html>

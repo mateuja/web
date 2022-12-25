@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>https://jaumemateu.xyz/</loc>
+    </url>
+    <url>
+        <loc>https://jaumemateu.xyz/archive/</loc>
+    </url>
+    <url>
+        <loc>https://jaumemateu.xyz/nix-versions/</loc>
+        <lastmod>2022-12-12</lastmod>
+    </url>
+    <url>
+        <loc>https://jaumemateu.xyz/page/1/</loc>
+    </url>
+    <url>
+        <loc>https://jaumemateu.xyz/tags/</loc>
+    </url>
+    <url>
+        <loc>https://jaumemateu.xyz/tags/nix/</loc>
+    </url>
+    <url>
+        <loc>https://jaumemateu.xyz/whoami/</loc>
+    </url>
+</urlset>

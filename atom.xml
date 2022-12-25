@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+	<title>Jaume Mateu</title>
+	<link href="https://jaumemateu.xyz/atom.xml" rel="self" type="application/atom+xml"/>
+  <link href="https://jaumemateu.xyz"/>
+	<generator uri="https://www.getzola.org/">Zola</generator>
+	<updated>2022-12-12T00:00:00+00:00</updated>
+	<id>https://jaumemateu.xyz/atom.xml</id>
+	<entry xml:lang="en">
+		<title>Using a specific package version in Nix</title>
+		<published>2022-12-12T00:00:00+00:00</published>
+		<updated>2022-12-12T00:00:00+00:00</updated>
+		<link rel="alternate" href="https://jaumemateu.xyz/nix-versions/" type="text/html"/>
+		<id>https://jaumemateu.xyz/nix-versions/</id>
+		<content type="html">&lt;p&gt;As part of my journey to learn Haskell, I recently started reading &lt;a href=&quot;https:&#x2F;&#x2F;www.manning.com&#x2F;books&#x2F;haskell-in-depth&quot;&gt;Haskell in
+Depth&lt;&#x2F;a&gt; by Vitaly Bragilevsky.
+The book has an associated repository with code examples that is supposed to be
+compiled with GHC 8.6 and newer. My idea was to build a simple nix expression
+that installed the required dependencies. Although the project is prepared to be
+compiled with both cabal and stack, all the development environments for Haskell
+that I had created until then used stack, so I wanted to give cabal a try.
+Besides, I had recently skimmed through Gabriela Gonzalez&#x27;s
+&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;Gabriella439&#x2F;haskell-nix&quot;&gt;haskell-nix&lt;&#x2F;a&gt; repository, in which
+she comments that while Nix is more of a stack substitute, it complements quite
+well with cabal.&lt;&#x2F;p&gt;
+&lt;p&gt;Since the beginning, I started facing problems with dependencies. Neither
+installing cabal and then running &lt;code&gt;cabal build&lt;&#x2F;code&gt; nor using cabal2nix worked. I
+suspect that the problems with the latter were related to the fact that there
+are multiple executables in the project and cabal2nix did not include all of
+them in the generated nix expression. I even ended up trying to use stack, but
+it failed too.&lt;&#x2F;p&gt;
+&lt;p&gt;At some point, I decided that maybe it would be good to reproduce as much as
+possible the development environment of the author, even if the book claimed
+that the project worked with newer versions of GHC. The 8.8.3 version was no
+longer available in the unstable nix-channel, so I had to do some research to
+find a way to retrieve it. I came across this
+&lt;a href=&quot;https:&#x2F;&#x2F;lazamar.co.uk&#x2F;nix-versions&#x2F;&quot;&gt;website&lt;&#x2F;a&gt; which makes it possible to find
+all the versions that were available in a nixpkgs channel for the required
+package and automatically creates a Nix expression to retrieve it. I do not know
+if there are other ways to do the same, but for a Nix newbie like me, this was
+extremely helpful. With some minor additions, I was able to create the following
+&lt;code&gt;shell.nix&lt;&#x2F;code&gt;&lt;sup class=&quot;footnote-reference&quot;&gt;&lt;a href=&quot;#1&quot;&gt;1&lt;&#x2F;a&gt;&lt;&#x2F;sup&gt;:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;nix&quot; style=&quot;background-color:#191919;color:#f8f8f2;&quot; class=&quot;language-nix &quot;&gt;&lt;code class=&quot;language-nix&quot; data-lang=&quot;nix&quot;&gt;&lt;span style=&quot;color:#ff5e5e;&quot;&gt;let
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#6d6d6d;&quot;&gt;# This nixpkgs version corresponds to the ghc-8.8.3
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#97d8ea;&quot;&gt;pkgs &lt;&#x2F;span&gt;&lt;span style=&quot;color:#ff5e5e;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#6699cc;&quot;&gt;import
+&lt;&#x2F;span&gt;&lt;span&gt;    (&lt;&#x2F;span&gt;&lt;span style=&quot;color:#ff8942;&quot;&gt;builtins&lt;&#x2F;span&gt;&lt;span style=&quot;color:#ff5e5e;&quot;&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#fc9354;&quot;&gt;fetchTarball &lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;      &lt;&#x2F;span&gt;&lt;span style=&quot;color:#97d8ea;&quot;&gt;url &lt;&#x2F;span&gt;&lt;span style=&quot;color:#ff5e5e;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#ffffff;&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbe3bf;&quot;&gt;https:&#x2F;&#x2F;github.com&#x2F;NixOS&#x2F;nixpkgs&#x2F;archive&#x2F;2d9888f61c80f28b09d64f5e39d0ba02e3923057.tar.gz&lt;&#x2F;span&gt;&lt;span style=&quot;color:#ffffff;&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;    })
+&lt;&#x2F;span&gt;&lt;span&gt;    { };
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#ff5e5e;&quot;&gt;in
+&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#fc9354;&quot;&gt;pkgs&lt;&#x2F;span&gt;&lt;span style=&quot;color:#ff5e5e;&quot;&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#fc9354;&quot;&gt;mkShell &lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#97d8ea;&quot;&gt;name &lt;&#x2F;span&gt;&lt;span style=&quot;color:#ff5e5e;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#ffffff;&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbe3bf;&quot;&gt;dev-environment&lt;&#x2F;span&gt;&lt;span style=&quot;color:#ffffff;&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#97d8ea;&quot;&gt;buildInputs &lt;&#x2F;span&gt;&lt;span style=&quot;color:#ff5e5e;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span&gt;[
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#fc9354;&quot;&gt;pkgs&lt;&#x2F;span&gt;&lt;span style=&quot;color:#ff5e5e;&quot;&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#fc9354;&quot;&gt;ghc
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#fc9354;&quot;&gt;pkgs&lt;&#x2F;span&gt;&lt;span style=&quot;color:#ff5e5e;&quot;&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#fc9354;&quot;&gt;cabal-install
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#fc9354;&quot;&gt;pkgs&lt;&#x2F;span&gt;&lt;span style=&quot;color:#ff5e5e;&quot;&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#fc9354;&quot;&gt;ghcid
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#fc9354;&quot;&gt;pkgs&lt;&#x2F;span&gt;&lt;span style=&quot;color:#ff5e5e;&quot;&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#fc9354;&quot;&gt;zlib
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#fc9354;&quot;&gt;pkgs&lt;&#x2F;span&gt;&lt;span style=&quot;color:#ff5e5e;&quot;&gt;.&lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#fc9354;&quot;&gt;pkg-config
+&lt;&#x2F;span&gt;&lt;span&gt;  ];
+&lt;&#x2F;span&gt;&lt;span&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#97d8ea;&quot;&gt;shellHook &lt;&#x2F;span&gt;&lt;span style=&quot;color:#ff5e5e;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#ffffff;&quot;&gt;&amp;#39;&amp;#39;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbe3bf;&quot;&gt;    echo &amp;quot;Running cabal build...&amp;quot;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbe3bf;&quot;&gt;    cabal build
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbe3bf;&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbe3bf;&quot;&gt;    echo &amp;quot;Start developing&amp;quot;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbe3bf;&quot;&gt;  &lt;&#x2F;span&gt;&lt;span style=&quot;color:#ffffff;&quot;&gt;&amp;#39;&amp;#39;&lt;&#x2F;span&gt;&lt;span&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Now I can keep learning Haskell!&lt;&#x2F;p&gt;
+</content>
+	</entry>
+</feed>
