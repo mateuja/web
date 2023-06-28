@@ -2,6 +2,12 @@
 base_url = "https://jaumemateu.xyz"
 title = "Jaume Mateu"
 
+default_language = "en"
+
+output_dir = "public"
+
+preserve_dotfiles_in_output = false
+
 # Sass compilation is required
 compile_sass = true
 
