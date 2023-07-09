@@ -1,6 +1,11 @@
 name: "Build-and-deploy"
 on:
   push:
+    branches: ["main"]
+  schedule:
+    # Build at the beginning of each year
+    - cron: "0 0 1 1 *"
+
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to Github pages
 permissions:
